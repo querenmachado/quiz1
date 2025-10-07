@@ -54,8 +54,73 @@ function startQuiz() {
     showQuestion();
 }
 
+function resetState(){
+    nextButton.style.display="none";
+    while (answerButtons.firstChild){
+        answerButtons.removeChild(answerButtons.firstChild);
+    }
+}
+
 function showQuestion() {
-    let currentQuestion = questions[let currentQuestionIndex ];
+    resetState();
+    let currentQuestion = questions[currentQuestionIndex ];
     let questionNo = currentQuestionIndex + 1;
     questionElement.innerHTML = questionNo + "." + currentQuestion.question;
+
+    currentQuestion.answer.forEach((answer) => {
+        const button = document.createElement("button");
+        button.innerHTML = answer.text;
+        button.dataset.id = answer.id;
+        button.classList.add("btn");
+        button.addEventListener("click", selectAnswer);
+        answerButtons.appendChild(button);
+    })
+
 }
+
+function selectAnswer(e){
+    answers = questions[currentQuestionIndex].answers;
+    const correctAnswer = answers.filter((answer) => answer.corret == true)[0];
+
+    const selectedBtn = e.target;
+    const isCorrect = selectedBtn.dataset.id == correctAnswer.id;
+    if(isCorrect) {
+        selectedBtn.classList.add("correct");
+        score++;
+    }
+    else {
+        selectedBtn.classList.add("incorrect");
+    }
+    Array.from(answerButtons.children).forEach((button) => {    
+        button.disabled = true;
+    });
+    nextButton.style.display = "block";
+}
+
+function showScore(){
+    resetState();
+    questionElement.innerHTML = "Você acertou" ${score} de ${questions.length}!;
+    nextButton.innerHTML = "Play Again";
+    nextButton.style.display = "block";
+}
+
+function nextButton(){
+    currentQuestionIndex++;
+    if(currentQuestionIndex < question.length){
+        showQuestion();
+    } 
+    else {
+        showScore();
+    }
+}
+
+nextButton.addEventListener("click", () => {
+    if(currentQuestionIndex < question.length){
+        handleNextButton();
+    }
+    else{
+        startQuiz();
+    }
+})
+
+startQuiz();
